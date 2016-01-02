@@ -12,6 +12,7 @@ public class CityStats
     public int economy;
     public int defense;
     public int spirituality;
+    public int entertainment;
 
     string seed;
 
@@ -32,6 +33,7 @@ public class CityStats
         economy = pseudoRandom.Next(0, 100);
         defense = pseudoRandom.Next(0, 100);
         spirituality = pseudoRandom.Next(0, 100);
+        entertainment = pseudoRandom.Next(0, 100);
     }
 
 

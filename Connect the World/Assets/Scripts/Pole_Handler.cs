@@ -19,6 +19,9 @@ public class Pole_Handler : MonoBehaviour {
 
     Mouse_Controller mouse;
 
+    ConnectionType curChoseConnectionType;
+    ConnectionMode curChosenConnectionMode;
+
     void OnEnable()
     {
         gridPosX = Mathf.RoundToInt(transform.position.x);
@@ -51,13 +54,19 @@ public class Pole_Handler : MonoBehaviour {
             LineEndFollowMouse(curActiveLineR);
     }
 
-    public void AddNewConnection()
+    public void AddNewConnection(ConnectionMode connectMode, ConnectionType connectType)
     {
+        curChoseConnectionType = connectType;
+        curChosenConnectionMode = connectMode;
+
         if (curNumOfConnections < maxConnections)
         {
+  
             // Spawn the connection
             GameObject lineRenderer = ObjectPool.instance.GetObjectForType("Connection", true, new Vector3(transform.position.x, connectorYPosition, 0));
             lineRenderer.transform.SetParent(transform, true);
+
+            curNumOfConnections++;
 
             Activate(lineRenderer.GetComponent<LineRenderer>());
         }
@@ -101,6 +110,11 @@ public class Pole_Handler : MonoBehaviour {
             {
                 if (curTile.tileType == TileType.CITY || curTile.tileType == TileType.POLE)
                 {
+                    // Here the connection has been completed, so actually create the new connection
+                    Connection newConnect = new Connection(Mathf.RoundToInt(mouse.mousePosition.x), curChoseConnectionType, curChosenConnectionMode, myPole);
+
+                    Debug.Log("POLE: Made a new " + newConnect.connectionMode + " connection of type " + newConnect.connectionType);
+
                     isConnecting = false;
                     //lineR.SetPosition(1, world.GetCityFromTilePosX(curTile.posX).connectorPosition);
                 }
