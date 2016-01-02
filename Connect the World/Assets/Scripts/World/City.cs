@@ -79,4 +79,58 @@ public class City  {
         cityStats = new CityStats(name);
     }
 
+    public int GetStat(ConnectionType connectType)
+    {
+        int stat = 0;
+
+        switch (connectType)
+        {
+            case ConnectionType.Health:
+                stat = cityStats.health;
+                break;
+            case ConnectionType.Education:
+                stat = cityStats.education;
+                break;
+            case ConnectionType.Technology:
+                stat = cityStats.technology;
+                break;
+            case ConnectionType.Spirituality:
+                stat = cityStats.spirituality;
+                break;
+            case ConnectionType.Entertainment:
+                stat = cityStats.entertainment;
+                break;
+
+            default:
+                stat = 0;
+                break;
+        }
+
+        return stat;
+    }
+
+    public void ChangeStat(ConnectionType statType, int ammnt)
+    {
+        switch (statType)
+        {
+            case ConnectionType.Health:
+                cityStats.health += ammnt;
+                break;
+            case ConnectionType.Education:
+                cityStats.education += ammnt;
+                break;
+            case ConnectionType.Technology:
+                cityStats.technology += ammnt;
+                break;
+            case ConnectionType.Spirituality:
+                cityStats.spirituality += ammnt;
+                break;
+            case ConnectionType.Entertainment:
+                cityStats.entertainment += ammnt;
+                break;
+            default:
+                // no change
+                break;
+        }
+    }
 }

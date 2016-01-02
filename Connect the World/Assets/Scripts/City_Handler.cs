@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System;
+using System.Collections.Generic;
 
 public class City_Handler : MonoBehaviour {
 
@@ -9,15 +11,29 @@ public class City_Handler : MonoBehaviour {
 
     int gridPosX;
 
- 
+    Dictionary<Guid, Connection> cityConnections = new Dictionary<Guid, Connection>();
+
+    void OnEnable()
+    {
+        gridPosX = Mathf.RoundToInt(transform.position.x);
+        cityConnections.Clear();
+    }
 
     void Start()
     {
-        gridPosX = Mathf.RoundToInt(transform.position.x);
+       
         world = World_Generator.instance;
         myCity = world.GetCityAtLocationX(gridPosX);
 
     }
+
+    public void AddNewConnection(Guid id, Connection connection)
+    {
+        cityConnections.Add(id, connection);
+        Debug.Log(myCity.name + " added a new " + connection.connectionMode + " of type " + connection.connectionType);
+    }
+
+ 
 
     //void DebugCityStats(int x)
     //{

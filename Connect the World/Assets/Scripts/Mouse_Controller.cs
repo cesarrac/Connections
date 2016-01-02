@@ -130,6 +130,12 @@ public class Mouse_Controller : MonoBehaviour {
         DisplayConnectionTypeOptions();
     }
 
+    //public void ChangeToDestroyMode()
+    //{
+    //    // this allows Player to destroy connections
+
+    //}
+
     void DisplayConnectionTypeOptions()
     {
         connectionModePanel.SetActive(false);
