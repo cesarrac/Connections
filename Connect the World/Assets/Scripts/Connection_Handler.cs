@@ -68,6 +68,9 @@ public class Connection_Handler : MonoBehaviour {
                 // This connection can receive data of its type.
                 // Since this Connection is connected directly to a city we can just add to its stat here
                 SendData(receiverCity, myConnection.connectionType, myConnection.dataPacketSize);
+
+                // If the city stats panel is on, update its information through the Cities Manager
+                Cities_Manager.instance.UpdateCityInfoPanel(receiverCity.worldX);
             }
         }
         else

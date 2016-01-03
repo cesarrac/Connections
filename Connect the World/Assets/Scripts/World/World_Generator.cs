@@ -19,15 +19,13 @@ public class World_Generator : MonoBehaviour {
 
     Dictionary<int, Pole> poles = new Dictionary<int, Pole>();
 
-    Dictionary<int, City> cities = new Dictionary<int, City>();
+    public Dictionary<int, City> cities = new Dictionary<int, City>();
 
     public Transform cityHolder, poleHolder;
 
     ObjectPool objPool;
 
-    public Text cityName, cityHeal, cityEd, cityEnt, cityEcon, citySpirit, cityTech, cityDef;
-
-    public GameObject cityInfoPanel;
+    public int poleWidth = 1, poleHeight = 5;
 
     void Awake()
     {
@@ -99,10 +97,17 @@ public class World_Generator : MonoBehaviour {
             cities.Add(i + x, newCity);
 
             // Add this city key to the City Manager so it can have access to the cities dictionary
-            Cities_Manager.instance.AddKey(i + x);
+            Cities_Manager.instance.AddCityStat(newCity.cityStats);
 
             Debug.Log("Created a city called " + newCity.name + " with a population of " + newCity.population);
+            Debug.Log("Cities created = " + cities.Count);
         }
+
+        // After we are done creating all the cities tell the Cities Manager to sort the list of city stats by their average
+        //Cities_Manager.instance.SortListBy("Rating");
+
+        // Tell the World Events Manager it can now start generating events
+        World_Events_Manager.instance.StartGeneratingEvents();
     }
 
     void AddToGrid(int _x, int width, int height, TileType tileType, GameObject gObj)
@@ -125,6 +130,30 @@ public class World_Generator : MonoBehaviour {
         }
     }
 
+    public void RemoveFromGrid(int _x)
+    {
+        int width = poleWidth;
+        int height = poleHeight;
+
+        for (int w = 0; w < width; w++)
+        {
+            // Add to dictionary to point all these x coords to the same GameObject
+            if (worldGameObjects.ContainsKey(_x + w))
+            {
+                worldGameObjects.Remove(_x + w);
+            }
+
+
+            for (int h = 0; h < height; h++)
+            {
+                grid[_x + w, h] = new Tile(_x + w, h, width, height, TileType.EMPTY);
+
+            }
+        }
+
+        poles.Remove(_x);
+    }
+
 
 
     public void CreatePole(int x)
@@ -145,7 +174,7 @@ public class World_Generator : MonoBehaviour {
 
             pole.transform.SetParent(poleHolder, true);
 
-            AddToGrid(x, 1, 5, TileType.POLE, pole);
+            AddToGrid(x, poleWidth, poleHeight, TileType.POLE, pole);
 
             poles.Add(x, newPole);
 
@@ -223,32 +252,6 @@ public class World_Generator : MonoBehaviour {
     
     }
 
-    public void DisplayCityInfo(int x)
-    {
-        City thisCity = GetCityFromTilePosX(x);
-
-        if (thisCity != null)
-        {
-            cityName.text = thisCity.name;
-            cityHeal.text = thisCity.cityStats.health.ToString();
-            cityEd.text = thisCity.cityStats.education.ToString();
-            cityEnt.text = thisCity.cityStats.entertainment.ToString();
-            cityEcon.text = thisCity.cityStats.economy.ToString();
-            cityDef.text = thisCity.cityStats.defense.ToString();
-            cityTech.text = thisCity.cityStats.technology.ToString();
-            citySpirit.text = thisCity.cityStats.spirituality.ToString();
-
-            if (!cityInfoPanel.activeSelf)
-            {
-                cityInfoPanel.SetActive(true);
-            }
-
-        }
-    }
-
-    public void CloseCityInfoPanel()
-    {
-        cityInfoPanel.SetActive(false);
-    }
+  
 
 }

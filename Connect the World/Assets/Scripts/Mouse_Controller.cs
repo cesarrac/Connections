@@ -73,7 +73,7 @@ public class Mouse_Controller : MonoBehaviour {
                 {
                    if (curTile.tileType == TileType.CITY)
                     {
-                        world.DisplayCityInfo(curTile.posX);
+                        Cities_Manager.instance.DisplayCityInfo(curTile.posX);
                         // Center the camera on this city that we are displaying info for
                         //Vector3 center = lastFramePosition - curMousePosition;
                         //center.y = 0;
@@ -86,8 +86,12 @@ public class Mouse_Controller : MonoBehaviour {
                     // DESTROY Poles: ( By pooling them )
                     if (curTile.tileType == TileType.POLE)
                     {
+                     
                         if (world.GameObjectFromTileXCoord(curTile.posX) != null)
                             ObjectPool.instance.PoolObject(world.GameObjectFromTileXCoord(curTile.posX));
+
+                        // Remove from tiles grid
+                        world.RemoveFromGrid(curTile.posX);
 
                     }
 

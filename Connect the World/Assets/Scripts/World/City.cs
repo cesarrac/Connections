@@ -3,9 +3,9 @@ using System.Collections;
 using System;
 
 
-[System.Serializable]
-public class CityStats
+public class CityStats : IComparable<CityStats>
 {
+    public int myCity_XPos;
     public int health;
     public int education;
     public int technology;
@@ -13,13 +13,15 @@ public class CityStats
     public int defense;
     public int spirituality;
     public int entertainment;
+    public int[] statsArray;
+    public decimal average;
 
     string seed;
 
-    public CityStats(string _seed)
+    public CityStats(string _seed, int cityX)
     {
         seed = _seed;
-
+        myCity_XPos = cityX;
         InitStats();
     }
 
@@ -34,9 +36,41 @@ public class CityStats
         defense = pseudoRandom.Next(0, 100);
         spirituality = pseudoRandom.Next(0, 100);
         entertainment = pseudoRandom.Next(0, 100);
+
+        statsArray = new int[] { health, education, technology, economy, defense, spirituality, entertainment };
+
+        average = Average();
+
     }
 
+    int Sum()
+    {
+        int result = 0;
 
+        for (int i = 0; i < statsArray.Length; i++)
+        {
+            result += statsArray[i];
+        }
+
+        return result;
+    }
+
+    decimal Average()
+    {
+        int sum = Sum();
+        decimal result = sum / statsArray.Length;
+        return result;
+    }
+
+    public void CalculateAverage()
+    {
+        average = Average();
+    }
+
+    public int CompareTo(CityStats compareStats)
+    {
+        return this.average.CompareTo(compareStats.average);
+    }
 }
 
 [System.Serializable]
@@ -61,10 +95,12 @@ public class City  {
     // Where cable connections would hook up to.
     public Vector3 connectorPosition;
 
-    public float worldX;
+    public int worldX;
+
+    public ConnectionType highestStatType;
 
 
-    public City(string _name, int pop, float x, int width, int height, Vector3 _connectorPos)
+    public City(string _name, int pop, int x, int width, int height, Vector3 _connectorPos)
     {
         name = _name;
         population = pop;
@@ -76,7 +112,7 @@ public class City  {
         connectorPosition = _connectorPos;
 
         // Right now we are using the name of the city to generate its random starting stats
-        cityStats = new CityStats(name);
+        cityStats = new CityStats(name, worldX);
     }
 
     public int GetStat(ConnectionType connectType)
@@ -132,5 +168,13 @@ public class City  {
                 // no change
                 break;
         }
+
+        // After changing a stat (+/-) the City needs to recalculate its stats average
+        cityStats.CalculateAverage();
+    }
+
+    public void ChangePopulation(int change)
+    {
+        population += change;
     }
 }
