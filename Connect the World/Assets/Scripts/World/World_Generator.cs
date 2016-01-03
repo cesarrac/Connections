@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.UI;
 
 public class World_Generator : MonoBehaviour {
 
@@ -8,8 +9,6 @@ public class World_Generator : MonoBehaviour {
 
     public float buildingYPosition = 0f;
     public float poleBuildingPos = -0.5f;
-
-    public GameObject cityPreFab, polePrefab;
 
     public static World_Generator instance;
 
@@ -25,6 +24,10 @@ public class World_Generator : MonoBehaviour {
     public Transform cityHolder, poleHolder;
 
     ObjectPool objPool;
+
+    public Text cityName, cityHeal, cityEd, cityEnt, cityEcon, citySpirit, cityTech, cityDef;
+
+    public GameObject cityInfoPanel;
 
     void Awake()
     {
@@ -94,7 +97,9 @@ public class World_Generator : MonoBehaviour {
 
             // Add city to the cities dictionary, pointing to this instance of the City class with this X ( this X represents the base tile of this city, when a city is spawned its city handler script will ask to get the city using its X as the key)
             cities.Add(i + x, newCity);
-            
+
+            // Add this city key to the City Manager so it can have access to the cities dictionary
+            Cities_Manager.instance.AddKey(i + x);
 
             Debug.Log("Created a city called " + newCity.name + " with a population of " + newCity.population);
         }
@@ -205,9 +210,45 @@ public class World_Generator : MonoBehaviour {
 
     public City GetCityFromTilePosX(int tilePosX)
     {
-        int x = Mathf.RoundToInt(GameObjectFromTileXCoord(tilePosX).transform.position.x);
+        if (GameObjectFromTileXCoord(tilePosX) != null)
+        {
+            int x = Mathf.RoundToInt(GameObjectFromTileXCoord(tilePosX).transform.position.x);
+            return GetCityAtLocationX(x);
+        }
+        else
+        {
+            return null;
+        }
 
-        return GetCityAtLocationX(x);
+    
+    }
+
+    public void DisplayCityInfo(int x)
+    {
+        City thisCity = GetCityFromTilePosX(x);
+
+        if (thisCity != null)
+        {
+            cityName.text = thisCity.name;
+            cityHeal.text = thisCity.cityStats.health.ToString();
+            cityEd.text = thisCity.cityStats.education.ToString();
+            cityEnt.text = thisCity.cityStats.entertainment.ToString();
+            cityEcon.text = thisCity.cityStats.economy.ToString();
+            cityDef.text = thisCity.cityStats.defense.ToString();
+            cityTech.text = thisCity.cityStats.technology.ToString();
+            citySpirit.text = thisCity.cityStats.spirituality.ToString();
+
+            if (!cityInfoPanel.activeSelf)
+            {
+                cityInfoPanel.SetActive(true);
+            }
+
+        }
+    }
+
+    public void CloseCityInfoPanel()
+    {
+        cityInfoPanel.SetActive(false);
     }
 
 }

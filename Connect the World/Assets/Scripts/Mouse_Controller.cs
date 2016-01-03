@@ -2,7 +2,7 @@
 using System.Collections;
 
 
-
+public enum BuildMode { BUILD_POLE, DESTROY, NONE }
 public class Mouse_Controller : MonoBehaviour {
 
     public static Mouse_Controller instance { get; protected set; }
@@ -12,9 +12,9 @@ public class Mouse_Controller : MonoBehaviour {
 
     Vector3 lastFramePosition = Vector3.zero;
 
-    float constantY = 4.3f;
+    //float constantY = 4.3f;
 
-    float constantYBuildPosition = 1.2f;
+    //float constantYBuildPosition = 1.2f;
 
     int gridWidth, gridHeight;
 
@@ -25,7 +25,9 @@ public class Mouse_Controller : MonoBehaviour {
 
     ConnectionType connectionType;
 
-    public GameObject connectionModePanel, connectionTypePanel;
+    BuildMode buildMode = BuildMode.NONE;
+
+    public GameObject connectionModePanel, connectionTypePanel, mainMenuPanel;
 
     void Awake()
     {
@@ -53,16 +55,46 @@ public class Mouse_Controller : MonoBehaviour {
         if (Input.GetMouseButtonDown(1))
         {
             Tile curTile = GetTileUnderMouse();
+
             if (curTile != null)
             {
-                if (curTile.tileType == TileType.EMPTY)
+                if (buildMode == BuildMode.BUILD_POLE)
                 {
-                    PlacePole();
+                    if (curTile.tileType == TileType.EMPTY)
+                    {
+                        PlacePole();
+                    }
+                    else if (curTile.tileType == TileType.POLE)
+                    {
+                        ActivatePole(curTile.posX);
+                    }
                 }
-                else if (curTile.tileType == TileType.POLE)
+                else if (buildMode == BuildMode.NONE)
                 {
-                    ActivatePole(curTile.posX);
+                   if (curTile.tileType == TileType.CITY)
+                    {
+                        world.DisplayCityInfo(curTile.posX);
+                        // Center the camera on this city that we are displaying info for
+                        //Vector3 center = lastFramePosition - curMousePosition;
+                        //center.y = 0;
+                        //Camera.main.transform.Translate(center);
+                    }
+
                 }
+                else
+                {
+                    // DESTROY Poles: ( By pooling them )
+                    if (curTile.tileType == TileType.POLE)
+                    {
+                        if (world.GameObjectFromTileXCoord(curTile.posX) != null)
+                            ObjectPool.instance.PoolObject(world.GameObjectFromTileXCoord(curTile.posX));
+
+                    }
+
+                    // Always after attempting any Destruction, reset the build mode to None
+                    buildMode = BuildMode.NONE;
+                }
+
             }
             else
             {
@@ -70,6 +102,7 @@ public class Mouse_Controller : MonoBehaviour {
             }
 
         }
+       
 
         mousePosition = curMousePosition;
   
@@ -95,8 +128,16 @@ public class Mouse_Controller : MonoBehaviour {
 
     void PlacePole()
     {
-        int x = Mathf.RoundToInt(curMousePosition.x);
-        world.CreatePole(x);
+        // Check with the Money Manager to see if this purchase can be made
+        if (Money_Manager.instance.Purchase("Pole"))
+        {
+            int x = Mathf.RoundToInt(curMousePosition.x);
+            world.CreatePole(x);
+            // POLE HAS BEEN PLACED!
+        }
+    
+
+
 
     }
 
@@ -117,28 +158,59 @@ public class Mouse_Controller : MonoBehaviour {
         return null;
     }
 
+    // There are TWO BUILD MODES: Build Pole, Destroy or None (for not building)
+    public void ChangeToBuildMode(string mode)
+    {
+        switch (mode)
+        {
+            case "Build Pole":
+                buildMode = BuildMode.BUILD_POLE;
+                DisplayConnectionModeOptions();
+                break;
+            case "Destroy":
+                buildMode = BuildMode.DESTROY;
+                break;
+            case "None":
+                buildMode = BuildMode.NONE;
+                DisplayMainMenu();
+                break;
+            default:
+                buildMode = BuildMode.NONE;
+                break;
+        }
+        
+
+    }
+
+
     // There are TWO CONNECTION MODES. Input and Output
-    public void ChangeToInputMode()
+    public void ChangeConnectionMode(string mode)
     {
-        connectionMode = ConnectionMode.INPUT;
-        DisplayConnectionTypeOptions();
+        if (mode == "Input")
+        {
+            connectionMode = ConnectionMode.INPUT;
+            DisplayConnectionTypeOptions();
+        }
+        else if (mode == "Output")
+        {
+            connectionMode = ConnectionMode.OUTPUT;
+            DisplayConnectionTypeOptions();
+        }
     }
+   
 
-    public void ChangeToOutputMode()
+    void DisplayMainMenu()
     {
-        connectionMode = ConnectionMode.OUTPUT;
-        DisplayConnectionTypeOptions();
+        connectionTypePanel.SetActive(false);
+        connectionModePanel.SetActive(false);
+
+        mainMenuPanel.SetActive(true);
     }
-
-    //public void ChangeToDestroyMode()
-    //{
-    //    // this allows Player to destroy connections
-
-    //}
 
     void DisplayConnectionTypeOptions()
     {
         connectionModePanel.SetActive(false);
+        mainMenuPanel.SetActive(false);
 
         connectionTypePanel.SetActive(true);
     }
@@ -146,6 +218,7 @@ public class Mouse_Controller : MonoBehaviour {
     void DisplayConnectionModeOptions()
     {
         connectionTypePanel.SetActive(false);
+        mainMenuPanel.SetActive(false);
 
         connectionModePanel.SetActive(true);
     }
