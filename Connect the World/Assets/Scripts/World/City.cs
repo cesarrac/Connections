@@ -13,6 +13,7 @@ public class CityStats : IComparable<CityStats>
     public int defense;
     public int spirituality;
     public int entertainment;
+    public int agriculture;
     public int[] statsArray;
     public decimal average;
 
@@ -36,8 +37,9 @@ public class CityStats : IComparable<CityStats>
         defense = pseudoRandom.Next(0, 100);
         spirituality = pseudoRandom.Next(0, 100);
         entertainment = pseudoRandom.Next(0, 100);
+        agriculture = pseudoRandom.Next(0, 100);
 
-        statsArray = new int[] { health, education, technology, economy, defense, spirituality, entertainment };
+        statsArray = new int[] { health, education, technology, economy, defense, spirituality, entertainment, agriculture };
 
         average = Average();
 

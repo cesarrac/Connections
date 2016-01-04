@@ -136,7 +136,7 @@ public class Pole_Handler : MonoBehaviour {
             ObjectPool.instance.PoolObject(lineR.gameObject);
         }
 
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0) && mouse.GetTileUnderMouse().tileType == TileType.CITY)
         {
             // CONNECTION HAS BEEN MADE!
             // Charge the Money Manager for its wire purchase. Later I will add a wire type (basic, advanced, etc.) that will have a different cost and different features.

@@ -10,7 +10,7 @@ public class Cities_Manager : MonoBehaviour {
 
     World_Generator world;
 
-    public Text cityName, cityHeal, cityEd, cityEnt, cityEcon, citySpirit, cityTech, cityDef, cityRating, cityPop;
+    public Text cityName, cityHeal, cityEd, cityEnt, cityEcon, citySpirit, cityTech, cityDef, cityRating, cityPop, cityAgri;
 
     public GameObject cityStatsPanel;
 
@@ -57,6 +57,7 @@ public class Cities_Manager : MonoBehaviour {
             citySpirit.text = thisCity.cityStats.spirituality.ToString();
             cityRating.text = thisCity.cityStats.average.ToString();
             cityPop.text = thisCity.population.ToString();
+            cityAgri.text = thisCity.cityStats.agriculture.ToString();
 
             if (!cityStatsPanel.activeSelf)
             {

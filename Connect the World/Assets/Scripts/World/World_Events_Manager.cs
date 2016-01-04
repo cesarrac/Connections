@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.UI;
 
 public class World_Events_Manager : MonoBehaviour {
 
@@ -31,9 +32,26 @@ public class World_Events_Manager : MonoBehaviour {
 
     bool isCurrentlyOnEvent = false;
 
+    UIManager ui;
+
+    [Header ("If the lowest of the list is higher than this, no change occurs:")]
+    public int statThreshold = 90;
+
+    public int monthsPassed { get; protected set; }
+    public int yearsPassed { get; protected set; }
+
     void Awake()
     {
         instance = this;
+        monthsPassed = 0;
+        yearsPassed = 0;
+    }
+
+    void Start()
+    {
+        ui = UIManager.instance;
+
+        StartCoroutine("TimeTracker");
     }
 
     public void StartGeneratingEvents()
@@ -60,6 +78,24 @@ public class World_Events_Manager : MonoBehaviour {
             PlayNewEvent();
         }
 
+    }
+
+    IEnumerator TimeTracker()
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(monthInSeconds);
+
+            monthsPassed++;
+
+            if (monthsPassed >= 12)
+            {
+                yearsPassed++;
+                monthsPassed = 0;
+            }
+
+            ui.DisplayTimePanel(monthsPassed, yearsPassed);
+        }
     }
 
     IEnumerator CheckForNewEvents()
@@ -133,6 +169,46 @@ public class World_Events_Manager : MonoBehaviour {
         lowestForPopChange_1 = World_Generator.instance.GetCityAtLocationX(city_manager.all_CityStats[0].myCity_XPos);
         lowestForPopChange_2 = World_Generator.instance.GetCityAtLocationX(city_manager.all_CityStats[1].myCity_XPos);
 
+        if (sortType == ConnectionType.Health)
+        {
+            if (lowestForPopChange_1.cityStats.health >= statThreshold && lowestForPopChange_2.cityStats.health >= statThreshold)
+            {
+                isCurrentlyOnEvent = false;
+                curWorldEvent.isPastEvent = true;
+                return;
+            }
+            else
+            {
+                ui.DisplayAnnouncementPanel("Healthy!", "Congratulations! Everyone in the world is in great health!");
+            }
+        }
+        else if (sortType == ConnectionType.Defense)
+        {
+            if (lowestForPopChange_1.cityStats.defense >= statThreshold && lowestForPopChange_2.cityStats.defense >= statThreshold)
+            {
+                isCurrentlyOnEvent = false;
+                curWorldEvent.isPastEvent = true;
+                return;
+            }
+            else
+            {
+                ui.DisplayAnnouncementPanel("Well-Defended!", "Congratulations! Everyone in the world is armed to the teeth!");
+            }
+        }
+        else if (sortType == ConnectionType.Technology)
+        {
+            if (lowestForPopChange_1.cityStats.technology >= statThreshold && lowestForPopChange_2.cityStats.technology >= statThreshold)
+            {
+                isCurrentlyOnEvent = false;
+                curWorldEvent.isPastEvent = true;
+                return;
+            }
+            else
+            {
+                ui.DisplayAnnouncementPanel("High Tech!", "Congratulations! Everyone in the world has access to advanced tech!");
+            }
+        }
+
         StartCoroutine("DecreasePopulation");
     }
 
@@ -169,7 +245,8 @@ public class World_Events_Manager : MonoBehaviour {
                 city_manager.UpdateCityInfoPanel(lowestForPopChange_1.worldX);
                 city_manager.UpdateCityInfoPanel(lowestForPopChange_2.worldX);
 
-                Debug.Log(lowestForPopChange_1.name + " and " + lowestForPopChange_2.name + "'s citizens are dying from " + curWorldEvent.eventType);
+                string description = lowestForPopChange_1.name + " and " + lowestForPopChange_2.name + "'s citizens are dying from " + curWorldEvent.eventType;
+                ui.DisplayEventPanel(curWorldEvent.eventType, description);
                 
             }
             else
@@ -204,8 +281,11 @@ public class World_Events_Manager : MonoBehaviour {
                 city_manager.UpdateCityInfoPanel(lowestForHighStat_1.worldX);
                 city_manager.UpdateCityInfoPanel(lowestForHighStat_2.worldX);
 
-                Debug.Log(lowestForHighStat_1.name + "'s " + lowestForHighStat_1.highestStatType +" industry has been hit hard by the recession.");
-                Debug.Log(lowestForHighStat_2.name + "'s " + lowestForHighStat_2.highestStatType + " industry has been hit hard by the recession.");
+
+                string description = lowestForHighStat_1.name + "'s " + lowestForHighStat_1.highestStatType + " industry and " +
+                    lowestForHighStat_2.name + "'s " + lowestForHighStat_2.highestStatType + " industry have been hit hard by the recession.";
+
+                ui.DisplayEventPanel(curWorldEvent.eventType, description);
             }
             else
             {
@@ -223,4 +303,6 @@ public class World_Events_Manager : MonoBehaviour {
 
         }
     }
+
+
 }

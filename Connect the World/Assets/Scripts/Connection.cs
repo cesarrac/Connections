@@ -2,7 +2,7 @@
 using System.Collections;
 
 public enum ConnectionMode { INPUT, OUTPUT }
-public enum ConnectionType { Health, Education, Technology, Defense, Spirituality, Economy, Entertainment}
+public enum ConnectionType { Health, Education, Technology, Defense, Spirituality, Economy, Entertainment, Agriculture}
 public enum Connector { Pole, City }
 
 public class Connection {
