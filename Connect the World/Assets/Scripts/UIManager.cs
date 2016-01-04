@@ -5,10 +5,14 @@ using UnityEngine.UI;
 public class UIManager : MonoBehaviour {
 
     public static UIManager instance { get; protected set; }
+
+    [Header ("Panels: ")]
     public GameObject eventPanel, gameAnnouncementPanel;
+    [Header ("Text: ")]
     public Text eventTitle, eventDescription;
     public Text announceTitle, annouceDesc;
     public Text yearText, monthsText;
+    public Text currCapitalTxt;
 
     void Awake()
     {
@@ -59,6 +63,10 @@ public class UIManager : MonoBehaviour {
         monthsText.text = months.ToString();
     }
 
+    public void DisplayCurrentCapital(decimal totalCapital)
+    {
+        currCapitalTxt.text = totalCapital.ToString();
+    }
 
 }
 

@@ -12,7 +12,7 @@ public class Money_Manager : MonoBehaviour {
 
     Dictionary<string, decimal> assetCost_Dict = new Dictionary<string, decimal>();
 
-    public Text currCapitalTxt;
+    decimal substrictionFee = 5.00m;
 
     void Awake()
     {
@@ -63,7 +63,15 @@ public class Money_Manager : MonoBehaviour {
 
     void DisplayCurrentCapital()
     {
-        currCapitalTxt.text = totalCapital.ToString();
+        UIManager.instance.DisplayCurrentCapital(totalCapital);
+    }
+
+    public void ChargeSubscriptionFee(int connectionsCount, int population)
+    {
+        int customerTotal = connectionsCount * population;
+        decimal result = customerTotal / 500;
+
+        Pay(result * 10.00m);
     }
 
 }

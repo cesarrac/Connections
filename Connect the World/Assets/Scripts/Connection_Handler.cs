@@ -12,11 +12,14 @@ public class Connection_Handler : MonoBehaviour {
 
     Pole_Handler originPole_handler;
 
+    Connection_Manager connection_manager;
+
     void Start()
     {
         
         world = World_Generator.instance;
 
+        connection_manager = Connection_Manager.instance;
 
     }
 
@@ -27,7 +30,11 @@ public class Connection_Handler : MonoBehaviour {
 
         Debug.Log("CONNECTION: Initialized connection!");
 
-        originPole_handler = world.GameObjectFromTileXCoord(Mathf.RoundToInt(transform.parent.position.x)).GetComponent<Pole_Handler>();
+        //originPole_handler = world.GameObjectFromTileXCoord(Mathf.RoundToInt(transform.parent.position.x)).GetComponent<Pole_Handler>();
+        originPole_handler = connection_manager.GetPoleHandler(Mathf.RoundToInt(transform.parent.position.x));
+
+        if (originPole_handler == null)
+            Debug.LogError("New Connection could not find it's origin pole from the Connection Manager! Was it not set? Is the X coordinate incorrect?");
 
         // As soon as the connection has been initialized, it can start Transferring Data ONLY if it's an INPUT connection
         if (newConnection.connectionMode == ConnectionMode.INPUT)
@@ -45,7 +52,8 @@ public class Connection_Handler : MonoBehaviour {
 
         // First make sure that my pole has an output connection of my connection type
         if (originPole_handler == null)
-            originPole_handler = world.GameObjectFromTileXCoord(Mathf.RoundToInt(transform.parent.position.x)).GetComponent<Pole_Handler>();
+            Debug.LogError("New Connection could not find it's origin pole from the Connection Manager! Was it not set? Is the X coordinate incorrect?");
+             //originPole_handler = world.GameObjectFromTileXCoord(Mathf.RoundToInt(transform.parent.position.x)).GetComponent<Pole_Handler>();
 
         if (originPole_handler.outputConnections.ContainsKey(myConnection.connectionType))
         {
@@ -53,12 +61,16 @@ public class Connection_Handler : MonoBehaviour {
             City myCity = world.GetCityFromTilePosX(myConnection.end_x_position);
 
             City receiverCity = originPole_handler.outputConnections[myConnection.connectionType].outputCity;
+
             if (receiverCity == null)
             {
                 // if this is null it is probably because the Player set added an output connection to a pole that had no output connections
-                // get the output city of my output connection's connector
-                receiverCity = world.GameObjectFromTileXCoord(originPole_handler.outputConnections[myConnection.connectionType].
-                    end_x_position).GetComponent<Pole_Handler>().outputConnections[myConnection.connectionType].outputCity;
+                // get the output city of my output connection's connector pole
+                receiverCity = connection_manager.GetPoleHandler(originPole_handler.outputConnections[myConnection.connectionType].end_x_position).
+                               outputConnections[myConnection.connectionType].outputCity;
+
+                //receiverCity = world.GameObjectFromTileXCoord(originPole_handler.outputConnections[myConnection.connectionType].
+                //    end_x_position).GetComponent<Pole_Handler>().outputConnections[myConnection.connectionType].outputCity;
                 if (receiverCity == null)
                     Debug.LogError("CONNECTION: Could not find the output city!");
             }
@@ -71,6 +83,10 @@ public class Connection_Handler : MonoBehaviour {
 
                 // If the city stats panel is on, update its information through the Cities Manager
                 Cities_Manager.instance.UpdateCityInfoPanel(receiverCity.worldX);
+            }
+            else
+            {
+                Debug.Log("CONNECTION: Can't send data because receiver city has the higher " + myConnection.connectionType + " stat!");
             }
         }
         else

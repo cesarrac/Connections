@@ -175,12 +175,10 @@ public class World_Events_Manager : MonoBehaviour {
             {
                 isCurrentlyOnEvent = false;
                 curWorldEvent.isPastEvent = true;
+                ui.DisplayAnnouncementPanel("Healthy!", "Congratulations! Everyone in the world is in great health!");
                 return;
             }
-            else
-            {
-                ui.DisplayAnnouncementPanel("Healthy!", "Congratulations! Everyone in the world is in great health!");
-            }
+        
         }
         else if (sortType == ConnectionType.Defense)
         {
@@ -188,12 +186,10 @@ public class World_Events_Manager : MonoBehaviour {
             {
                 isCurrentlyOnEvent = false;
                 curWorldEvent.isPastEvent = true;
+                ui.DisplayAnnouncementPanel("Well-Defended!", "Congratulations! Everyone in the world is armed to the teeth!");
                 return;
             }
-            else
-            {
-                ui.DisplayAnnouncementPanel("Well-Defended!", "Congratulations! Everyone in the world is armed to the teeth!");
-            }
+        
         }
         else if (sortType == ConnectionType.Technology)
         {
@@ -201,12 +197,11 @@ public class World_Events_Manager : MonoBehaviour {
             {
                 isCurrentlyOnEvent = false;
                 curWorldEvent.isPastEvent = true;
+                ui.DisplayAnnouncementPanel("High Tech!", "Congratulations! Everyone in the world has access to advanced tech!");
+
                 return;
             }
-            else
-            {
-                ui.DisplayAnnouncementPanel("High Tech!", "Congratulations! Everyone in the world has access to advanced tech!");
-            }
+        
         }
 
         StartCoroutine("DecreasePopulation");

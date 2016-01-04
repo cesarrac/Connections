@@ -24,13 +24,16 @@ public class Pole_Handler : MonoBehaviour {
     ConnectionType curChoseConnectionType;
     ConnectionMode curChosenConnectionMode;
 
-    Dictionary<Guid, Connection> connectionOnThisPole = new Dictionary<Guid, Connection>();
+    public Dictionary<Guid, Connection> connectionOnThisPole = new Dictionary<Guid, Connection>();
     public Dictionary<ConnectionType, Connection> inputConnections = new Dictionary<ConnectionType, Connection>();
     public Dictionary<ConnectionType, Connection> outputConnections = new Dictionary<ConnectionType, Connection>();
 
     GameObject connectionGObj;
 
     float maxWireLength = 20f; // < ---- threshold for how long a wire can go from its origin pole. Later on when I add wire types this can be passed in.
+
+    // The Connection Manager will hold a dictionary of all the pole handlers
+    Connection_Manager connect_manager;
 
     void OnEnable()
     {
@@ -45,6 +48,10 @@ public class Pole_Handler : MonoBehaviour {
         //lineR.gameObject.SetActive(false);
 
         curNumOfConnections = 0;
+
+        connect_manager = Connection_Manager.instance;
+        // Add this Pole Handler to the Connection Manager
+        connect_manager.AddNewPoleHandler(gridPosX, this);
 
         world = World_Generator.instance;
 

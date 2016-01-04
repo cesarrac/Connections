@@ -21,12 +21,16 @@ public class City_Handler : MonoBehaviour {
 
     SpriteRenderer sr;
 
+    public bool isPayingSubscription { get; protected set; }
+
     void OnEnable()
     {
         curYScale = startingYScale;
 
         gridPosX = Mathf.RoundToInt(transform.position.x);
         cityConnections.Clear();
+
+        isPayingSubscription = false;
     }
 
     void Awake()
@@ -42,13 +46,18 @@ public class City_Handler : MonoBehaviour {
         cityPopulation = myCity.population;
 
         StartCoroutine("CheckScale");
-
     }
 
     public void AddNewConnection(Guid id, Connection connection)
     {
         cityConnections.Add(id, connection);
         Debug.Log(myCity.name + " added a new " + connection.connectionMode + " of type " + connection.connectionType);
+
+        if (!isPayingSubscription)
+        {
+            isPayingSubscription = true;
+            StartCoroutine("PayingSub");
+        }
     }
 
     IEnumerator CheckScale()
@@ -104,15 +113,29 @@ public class City_Handler : MonoBehaviour {
         sr.color = Color.black;
     }
 
-    //void DebugCityStats(int x)
-    //{
-    //    City thisCity = world.GetCityAtLocationX(x);
-    //    if (thisCity != null)
-    //    {
-    //        Debug.Log("Name: " + thisCity.name + " Pop: " + thisCity.population + " Stats: ");
-    //        Debug.Log("Health: " + thisCity.cityStats.health + " Education: " + thisCity.cityStats.education);
-    //    }
-    //    else
-    //        Debug.Log("MOUSE cant find the city you are looking for! Maybe you're not clicking the base tile of that city... ");
-    //}
+    IEnumerator PayingSub()
+    {
+        while (true)
+        {
+            // Pay subscription (once this city actually has connections) once a month
+            if (cityConnections.Count > 0)
+            {
+                yield return new WaitForSeconds(World_Events_Manager.instance.monthInSeconds);
+                PaySubscription();
+            }
+            else
+            {
+                isPayingSubscription = false;
+                yield break;
+            }
+             
+        }
+    }
+
+    void PaySubscription()
+    {
+        // Total number of connections this city has, total population
+        Money_Manager.instance.ChargeSubscriptionFee(cityConnections.Count, myCity.population);
+        Debug.Log(myCity.name + " is paying subscription!");
+    }
 }
